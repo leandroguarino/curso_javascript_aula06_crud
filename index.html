@@ -7,13 +7,31 @@
     <script>      
         let animais = []
 
+        function getProximoId(){
+            //se nao há nenhum animal no vetor, devolve o ID = 1
+            if (animais.length == 0){
+                return 1
+            }else{
+                //pegar o último animal do vetor
+                //pegar o id do último animal do vetor
+                //somar + 1
+                let ultimaPosicaoVetor = animais.length - 1
+                let ultimoAnimal = animais[ultimaPosicaoVetor]
+                let idUltimoAnimal = ultimoAnimal.id
+                return idUltimoAnimal + 1
+            }
+        }
+
         function salvar(){
 
             let pedigree = document.getElementById("pedigree").value.trim()
             let nome = document.getElementById("nome").value.trim()
             let telefone = document.getElementById("telefone").value.trim()
 
+            let id = getProximoId()
+
             let animal = {
+                "id": id,
                 "pedigree": pedigree,
                 "nome": nome,
                 "telefone": telefone
@@ -57,11 +75,22 @@
                     <td>${animal.telefone}</td>
                     <td>
                         <button>Alterar</button>
-                        <button>Excluir</button>
+                        <button onclick="excluir(${animal.id})">Excluir</button>
                     </td>
                 </tr>`
 
                 tbody.appendChild(linha)
+            }
+        }
+
+        function excluir(idProcurado){
+            for(let contador = 0; contador <= animais.length - 1; contador++){
+                let animal = animais[contador]
+                if (animal.id == idProcurado){
+                    animais.splice(contador, 1) //remove um elemento da posição contador no vetor
+                    listar()
+                    break
+                }
             }
         }
     </script>
