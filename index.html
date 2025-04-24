@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Animais</title>
+    <script>      
+        let animais = []
+
+        function salvar(){
+
+            let pedigree = document.getElementById("pedigree").value.trim()
+            let nome = document.getElementById("nome").value.trim()
+            let telefone = document.getElementById("telefone").value.trim()
+
+            let animal = {
+                "pedigree": pedigree,
+                "nome": nome,
+                "telefone": telefone
+            }
+
+            animais.push(animal) //adiciona o animal na lista de animais
+            
+            alert("Cadastrado com sucesso")
+
+            limparForm()
+            focarCaixaPedigree()
+
+            listar()
+        }
+
+        function limparForm(){
+            document.getElementById("pedigree").value = ""
+            document.getElementById("nome").value = ""
+            document.getElementById("telefone").value = ""           
+        }
+
+        function focarCaixaPedigree(){
+            document.getElementById("pedigree").focus()
+        }
+
+        function listar(){
+            console.log("lista de animais")
+
+            let tbody = document.getElementById("tbody-animais")
+            tbody.innerHTML = "" //limpa a tabela
+
+            for(let contador = 0; contador <= animais.length - 1; contador++){
+                let animal = animais[contador]
+
+                console.log(contador, animal)
+                let linha = document.createElement("tr")
+
+                linha.innerHTML = `<tr>
+                    <td>${animal.pedigree}</td>
+                    <td>${animal.nome}</td>
+                    <td>${animal.telefone}</td>
+                    <td>
+                        <button>Alterar</button>
+                        <button>Excluir</button>
+                    </td>
+                </tr>`
+
+                tbody.appendChild(linha)
+            }
+        }
+    </script>
+</head>
+<body>
+    <form name="formulario" id="formulario" method="post">
+        <div>
+            <label>Pedigree</label>
+            <input type="text" name="pedigree" id="pedigree" />
+        </div>
+        <div>
+            <label>Nome</label>
+            <input type="text" name="nome" id="nome" />
+        </div>
+        <div>
+            <label>Telefone</label>
+            <input type="tel" name="telefone" id="telefone" />
+        </div>
+        <div>
+            <button type="button" onclick="salvar()">Salvar</button>
+        </div>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Pedigree</th>
+                <th>Nome</th>
+                <th>Telefone</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="tbody-animais">
+            
+        </tbody>
+    </table>
+</body>
+</html>
