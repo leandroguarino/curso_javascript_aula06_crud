@@ -4,8 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Animais</title>
+    <style>
+        .erro{
+            display: none;
+            color: #c00;
+        }
+        #mensagem{
+            display: none;
+            width: 300px;
+            height: 200px;
+            background-color: #009900;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: calc(50% - 100px);
+            left: calc(50% - 150px);
+        }
+    </style>
     <script>      
         let animais = []
+        let estaAdicionando = true
+        let idAnimalAlterado = null
 
         function getProximoId(){
             //se nao há nenhum animal no vetor, devolve o ID = 1
@@ -22,27 +41,71 @@
             }
         }
 
+        function validarDados(nome, telefone, pedigree){
+            let valido = true
+            if (nome.indexOf(" ") == -1){ //verifica se tem espaço
+                document.getElementById("erro-nome").style.display = "block"
+                valido = false
+            }
+            if (pedigree == ""){
+                document.getElementById("erro-pedigree").style.display = "block"
+                valido = false
+            }
+            if (telefone.length < 11){
+                document.getElementById("erro-telefone").style.display = "block"
+                valido = false
+            }
+            return valido
+        }
+
+        function exibirMensagem(texto){
+            document.getElementById("mensagem").style.display = "flex"
+            setTimeout(function(){
+                document.getElementById("mensagem").style.display = "none"
+            }, 2000)
+        }
+
         function salvar(){
 
             let pedigree = document.getElementById("pedigree").value.trim()
             let nome = document.getElementById("nome").value.trim()
             let telefone = document.getElementById("telefone").value.trim()
 
-            let id = getProximoId()
-
-            let animal = {
-                "id": id,
-                "pedigree": pedigree,
-                "nome": nome,
-                "telefone": telefone
+            if (!validarDados(nome, telefone, pedigree)){
+                return false
             }
 
-            animais.push(animal) //adiciona o animal na lista de animais
-            
-            alert("Cadastrado com sucesso")
+            if (estaAdicionando){ //(idAnimalAlterado == null)
+                let id = getProximoId()
+
+                let animal = {
+                    "id": id,
+                    "pedigree": pedigree,
+                    "nome": nome,
+                    "telefone": telefone
+                }
+
+                animais.push(animal) //adiciona o animal na lista de animais
+
+                exibirMensagem("Cadastrado com sucesso")
+            }else{ //está alterando
+                //busca o animal para ser atualizado
+                for(let contador = 0; contador <= animais.length - 1; contador++){
+                    let animal = animais[contador]
+                    if (animal.id == idAnimalAlterado){
+                        //ao encontrar o animal pelo ID, atualiza as informações dele
+                        animal.nome = nome
+                        animal.pedigree = pedigree
+                        animal.telefone = telefone
+                    }
+                }
+                exibirMensagem("Alterado com sucesso")
+            }            
 
             limparForm()
             focarCaixaPedigree()
+            estaAdicionando = true
+            idAnimalAlterado = null
 
             listar()
         }
@@ -55,6 +118,19 @@
 
         function focarCaixaPedigree(){
             document.getElementById("pedigree").focus()
+        }
+
+        function alterar(idProcurado){
+            for(let contador = 0; contador <= animais.length - 1; contador++){
+                let animal = animais[contador]
+                if (animal.id == idProcurado){
+                    document.getElementById("nome").value = animal.nome
+                    document.getElementById("pedigree").value = animal.pedigree
+                    document.getElementById("telefone").value = animal.telefone
+                    estaAdicionando = false
+                    idAnimalAlterado = animal.id
+                }
+            }
         }
 
         function listar(){
@@ -74,7 +150,7 @@
                     <td>${animal.nome}</td>
                     <td>${animal.telefone}</td>
                     <td>
-                        <button>Alterar</button>
+                        <button onclick="alterar(${animal.id})">Alterar</button>
                         <button onclick="excluir(${animal.id})">Excluir</button>
                     </td>
                 </tr>`
@@ -93,27 +169,42 @@
                 }
             }
         }
+
+        function adicionar(){
+            limparForm()
+            focarCaixaPedigree()
+            estaAdicionando = true
+            idAnimalAlterado = null
+        }
+
+        function limparErro(idErro){
+            document.getElementById(idErro).style.display = 'none'
+        }
     </script>
 </head>
 <body>
     <form name="formulario" id="formulario" method="post">
         <div>
             <label>Pedigree</label>
-            <input type="text" name="pedigree" id="pedigree" />
+            <input type="text" name="pedigree" id="pedigree" onkeydown="limparErro('erro-pedigree')" />
+            <span class="erro" id="erro-pedigree">Preencha o pedigree</span>
         </div>
         <div>
             <label>Nome</label>
-            <input type="text" name="nome" id="nome" />
+            <input type="text" name="nome" id="nome" onkeydown="limparErro('erro-nome')" />
+            <span class="erro" id="erro-nome">Preencha o nome completo</span>
         </div>
         <div>
             <label>Telefone</label>
-            <input type="tel" name="telefone" id="telefone" />
+            <input type="tel" name="telefone" id="telefone" onkeydown="limparErro('erro-telefone')" />
+            <span class="erro" id="erro-telefone">Preencha o telefone com DDD</span>
         </div>
         <div>
             <button type="button" onclick="salvar()">Salvar</button>
         </div>
     </form>
 
+    <button onclick="adicionar()">Adicionar</button>
     <table>
         <thead>
             <tr>
@@ -127,5 +218,9 @@
             
         </tbody>
     </table>
+
+    <div id="mensagem">
+        <p id="texto-mensagem">Cadastrado com sucesso</p>
+    </div>
 </body>
 </html>
